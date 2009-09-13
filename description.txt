@@ -1,0 +1,1 @@
+Frequently asked questions page. A simple, but robust plugin which makes maintenance of a FAQ page easier.

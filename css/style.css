@@ -1,0 +1,11 @@
+div.faq img {
+  border: 0;
+}
+
+div.hidden {
+  display: none;
+}
+
+#faq-questions a:focus {
+  -moz-outline-style: none;
+}
