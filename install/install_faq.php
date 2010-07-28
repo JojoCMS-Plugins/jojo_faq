@@ -27,6 +27,7 @@ $query = "
         `fq_faqurl` varchar(255) NOT NULL default '',
         `fq_order` int(11) NOT NULL default '0',
         `fq_metadesc` varchar(255) NOT NULL default '',
+        `fq_pageid` int(11) NOT NULL default '0',
         `fq_updated` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
          PRIMARY KEY  (`faqid`)
          );";

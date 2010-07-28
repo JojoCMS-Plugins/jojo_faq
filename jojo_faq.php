@@ -41,32 +41,32 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
         $content['content'] = '';
 
         if (!empty($id) || !empty($url)) {
-            $faqs = array();
+            $faq = false;
             if (!empty($id)) {
-                $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE `faqid`=? LIMIT 1", $id);
+                $faq = Jojo::selectRow("SELECT * FROM {faq} WHERE `faqid`=? AND `fq_pageid` = ? LIMIT 1", array($id, $this->id));
             } elseif (!empty($url)) {
-                $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE `fq_faqurl`=? LIMIT 1", $url);
+                $faq = Jojo::selectRow("SELECT * FROM {faq} WHERE `fq_faqurl`=? AND `fq_pageid` = ? LIMIT 1", array($url, $this->id));
             }
 
-            if (!count($faqs)) {
-                Jojo::redirect(_SITEURL.'/'.self::getPrefix().'/');
+            if (!$faq) {
+                Jojo::redirect(_SITEURL . '/' . self::getPrefix() . '/');
             }
 
-            $smarty->assign('faq', $faqs[0]);
-            $content['title']           = $faqs[0]['fq_question'];
-            $content['seotitle']        = $faqs[0]['fq_question'];
-            $content['metadescription'] = $faqs[0]['fq_metadesc'];
+            $smarty->assign('faq', $faq);
+            $content['title']           = $faq['fq_question'];
+            $content['seotitle']        = $faq['fq_question'];
+            $content['metadescription'] = $faq['fq_metadesc'];
 
             /* Add breadcrumb */
             $breadcrumbs = $this->_getBreadCrumbs();
             $breadcrumb = array();
-            $breadcrumb['name'] = $faqs[0]['fq_question'];
-            $breadcrumb['url'] = !empty($faqs[0]['fq_faqurl']) ? _SITEURL.'/'.$prefix.'/'.$faqs[0]['fq_faqurl'].'/' : _SITEURL.'/'.$prefix.'/'.$id.'/';
+            $breadcrumb['name'] = $faq['fq_question'];
+            $breadcrumb['url'] = !empty($faq['fq_faqurl']) ? _SITEURL.'/'.$prefix.'/'.$faq['fq_faqurl'].'/' : _SITEURL.'/'.$prefix.'/'.$id.'/';
             $breadcrumbs[count($breadcrumbs)] = $breadcrumb;
             $content['breadcrumbs'] = $breadcrumbs;
         }
 
-        $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE 1 ORDER BY fq_order, fq_question");
+        $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE `fq_pageid` = ?  ORDER BY fq_order, fq_question", array($this->id));
         $smarty->assign('faqs', $faqs);
         if (Jojo::getOption('faq_detail_pages') == 'yes') {
             if (!empty($id) || !empty($url)) {
@@ -81,6 +81,24 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
         return $content;
     }
 
+    /**
+     * Work out if the provided uri is a uri for a FAQ
+     */
+    static function isUrl($uri) {
+        foreach (Jojo::selectAssoc('SELECT pageid, pg_url FROM {page} WHERE pg_link = "jojo_plugin_jojo_faq"') as $pageid => $prefix) {
+            if (preg_match("#^$prefix/([0-9]+)$#", $uri, $matches)) {
+                /* faq/123/ */
+                $_GET['id'] = $matches[1];
+                return $pageid;
+            } elseif (preg_match("#^$prefix/([a-z0-9-_]+)$#", $uri, $matches)) {
+                /* faq/what-is-your-name/ */
+                $_GET['uri'] = $matches[1];
+                return $pageid;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * XML Sitemap filter
@@ -91,12 +109,12 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
     {
         if (Jojo::getOption('faq_detail_pages') == 'yes') {
             /* Get FAQ pages from database */
-            $prefix = Jojo::selectQuery("SELECT pg_url from {page} WHERE pg_link =	'jojo_plugin_jojo_faq'");
-            $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE 1 ORDER BY fq_order, fq_question");
+            $prefix = Jojo::selectAssoc("SELECT pageid, pg_url from {page} WHERE pg_link = 'jojo_plugin_jojo_faq'");
+            $faqs = Jojo::selectQuery("SELECT * FROM {faq} ORDER BY fq_order, fq_question");
 
             /* Add FAQ pages to sitemap */
             foreach($faqs as $faq) {
-                $url           = _SITEURL . '/'.$prefix[0]['pg_url'].'/'. Jojo::either($faq['fq_faqurl'], $faq['faqid']).'/';
+                $url           = _SITEURL . '/' . $prefix[$faq['fq_pageid']] . '/'. Jojo::either($faq['fq_faqurl'], $faq['faqid']).'/';
                 $lastmod       = $faq['fq_updated'];
                 $changefreq    = '';
                 $priority      = 0.4;

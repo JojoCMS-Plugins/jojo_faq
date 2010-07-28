@@ -21,12 +21,6 @@ $_provides['pluginClasses'] = array(
         'Jojo_Plugin_Jojo_faq' => 'FAQ page'
         );
 
-/* Register URI patterns */
-$prefix = 'faq';
-
-Jojo::registerURI("$prefix/[id:integer]", 'Jojo_Plugin_Jojo_faq'); // "faq/123/"
-Jojo::registerURI("$prefix/[url:string]", 'Jojo_Plugin_Jojo_faq'); // "faq/what-is-your-name/"
-
 $_options[] = array(
     'id'          => 'faq_detail_pages',
     'category'    => 'FAQ',
@@ -39,8 +33,8 @@ $_options[] = array(
 );
 
 if (Jojo::getOption('faq_detail_pages') == 'yes') {
-    /* Sitemap filter */
-    //Jojo::addFilter('jojo_sitemap', 'sitemap', 'jojo_faq'); //do we really want the FAQ items on the sitemap?
+    /* URI Handler */
+    Jojo::registerURI(null, 'Jojo_Plugin_Jojo_faq', 'isUrl');
 
     /* XML Sitemap filter */
     Jojo::addFilter('jojo_xml_sitemap', 'xmlsitemap', 'jojo_faq');

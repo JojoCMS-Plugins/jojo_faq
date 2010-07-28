@@ -49,3 +49,7 @@ if (!count($data)) {
     echo "Adding <b>Edit FAQ</b> Page to menu<br />";
     Jojo::insertQuery("INSERT INTO {page} SET pg_title='Edit FAQ', pg_link='Jojo_Plugin_Admin_Edit', pg_url='admin/edit/faq', pg_parent=?, pg_order=5, pg_mainnav='yes', pg_breadcrumbnav='yes', pg_sitemapnav='no', pg_xmlsitemapnav='no', pg_footernav='no', pg_index='no'", $_ADMIN_CONTENT_ID);
 }
+
+/* Assign any orphaned faqs to a page */
+$faqpageid = current(Jojo::selectRow("SELECT pageid FROM {page} WHERE pg_link='Jojo_Plugin_Jojo_faq' LIMIT 1"));
+Jojo::updateQuery('UPDATE {faq} SET fq_pageid = ? WHERE fq_pageid = 0', $faqpageid);
