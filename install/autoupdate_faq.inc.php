@@ -35,6 +35,7 @@ $default_fd['faq']['faqid'] = array(
 $default_fd['faq']['fq_pageid'] = array(
         'fd_name' => "Page to Show on",
         'fd_type' => "dbpluginpagelist",
+        'fd_type' => "text",
         'fd_options' => "Jojo_Plugin_Jojo_faq",
         'fd_readonly' => "0",
         'fd_default' => "0",
