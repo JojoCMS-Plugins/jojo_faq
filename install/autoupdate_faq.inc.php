@@ -20,6 +20,7 @@ $default_td['faq'] = array(
         'td_orderbyfields' => "fq_order, fq_question",
         'td_deleteoption' => "yes",
         'td_menutype' => "list",
+        'td_plugin' => 'Jojo_faq',
     );
 
 // ID Field
@@ -35,7 +36,7 @@ $default_fd['faq']['faqid'] = array(
 $default_fd['faq']['fq_pageid'] = array(
         'fd_name' => "Page to Show on",
         'fd_type' => "dbpluginpagelist",
-        'fd_options' => "Jojo_Plugin_Jojo_faq",
+        'fd_options' => "jojo_plugin_jojo_faq",
         'fd_readonly' => "0",
         'fd_default' => "0",
         'fd_order' => "2",
