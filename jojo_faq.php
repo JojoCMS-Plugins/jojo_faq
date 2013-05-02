@@ -31,10 +31,13 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
         $content = array();
         global $smarty;
 
-        $prefix = self::getPrefix();
-        $smarty->assign('prefix', $prefix);
+        $baseurl = _SITEURL . '/' . self::getPrefix();
+        $smarty->assign('prefix', $baseurl);
 
         $smarty->assign("faq_title", $this->page['pg_title']);
+        
+        $faq_detail = (boolean)(Jojo::getOption('faq_detail_pages', 'no') == 'yes');
+        $smarty->assign("faq_detail", $faq_detail);
 
         $id  = Util::getFormData('id', '');
         $url = Util::getFormData('url', '');
@@ -49,8 +52,9 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
             }
 
             if (!$faq) {
-                Jojo::redirect(_SITEURL . '/' . self::getPrefix() . '/');
+                Jojo::redirect($baseurl . '/');
             }
+            
 
             $smarty->assign('faq', $faq);
             $content['title']           = $faq['fq_question'];
@@ -61,19 +65,15 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
             $breadcrumbs = $this->_getBreadCrumbs();
             $breadcrumb = array();
             $breadcrumb['name'] = $faq['fq_question'];
-            $breadcrumb['url'] = !empty($faq['fq_faqurl']) ? _SITEURL.'/'.$prefix.'/'.$faq['fq_faqurl'].'/' : _SITEURL.'/'.$prefix.'/'.$id.'/';
+            $breadcrumb['url'] = !empty($faq['fq_faqurl']) ? $baseurl . '/' . $faq['fq_faqurl'] .'/' : $baseurl . $id . '/';
             $breadcrumbs[count($breadcrumbs)] = $breadcrumb;
             $content['breadcrumbs'] = $breadcrumbs;
         }
 
         $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE `fq_pageid` = ?  ORDER BY fq_order, fq_question", array($this->id));
         $smarty->assign('faqs', $faqs);
-        if (Jojo::getOption('faq_detail_pages') == 'yes') {
-            if (!empty($id) || !empty($url)) {
+        if ($faq_detail && (!empty($id) || !empty($url))) {
                 $content['content'] = $smarty->fetch('jojo_faq_detail.tpl');
-            } else {
-                $content['content'] = $this->page['pg_body']."<br />\n".$smarty->fetch('jojo_faq_index.tpl');
-            }
         } else {
             $content['content'] = $smarty->fetch('jojo_faq.tpl');
         }
@@ -105,7 +105,7 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
      *
      * Receives existing sitemap and adds FAQ pages
      */
-    function xmlsitemap($sitemap)
+    static function xmlsitemap($sitemap)
     {
         if (Jojo::getOption('faq_detail_pages') == 'yes') {
             /* Get FAQ pages from database */
@@ -126,24 +126,24 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
     }
 
 
-    function getCorrectUrl()
+     function getCorrectUrl()
     {
         $id  = Util::getFormData('id',  '');
         $url = Util::getFormData('url', '');
+        $baseurl = _SITEURL.'/'. self::getPrefix().'/';
 
         if (!empty($url)) {
             $data = Jojo::selectQuery("SELECT faqid, fq_faqurl FROM {faq} WHERE fq_faqurl=?", $url);
-            if (count($data)) return _SITEURL.'/'.JOJO_Plugin_Jojo_faq::getPrefix().'/'.$url.'/';
-        }
-        if (!empty($id)) {
+            if (count($data)) return $baseurl . $url . '/';
+        } elseif (!empty($id)) {
             $data = Jojo::selectQuery("SELECT faqid, fq_faqurl FROM {faq} WHERE faqid=?", $id);
             if (count($data)) {
-                if (!empty($data[0]['fq_faqurl'])) return _SITEURL.'/'.JOJO_Plugin_Jojo_faq::getPrefix().'/'.$data[0]['fq_faqurl'].'/';
-                return _SITEURL.'/'.JOJO_Plugin_Jojo_faq::getPrefix().'/'.$id.'/';
+                if (!empty($data[0]['fq_faqurl'])) return $baseurl . $data[0]['fq_faqurl'].'/';
+                return $baseurl . $id . '/';
             }
         }
 
-        return _SITEURL.'/'.JOJO_Plugin_Jojo_faq::getPrefix().'/';
+        return $baseurl;
 
     }
 
