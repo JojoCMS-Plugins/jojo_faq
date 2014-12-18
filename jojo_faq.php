@@ -39,8 +39,8 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
         $faq_detail = (boolean)(Jojo::getOption('faq_detail_pages', 'no') == 'yes');
         $smarty->assign("faq_detail", $faq_detail);
 
-        $id  = Util::getFormData('id', '');
-        $url = Util::getFormData('url', '');
+        $id  = Jojo::getFormData('id', '');
+        $url = Jojo::getFormData('url', '');
         $content['content'] = '';
 
         if (!empty($id) || !empty($url)) {
@@ -128,8 +128,8 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
 
      function getCorrectUrl()
     {
-        $id  = Util::getFormData('id',  '');
-        $url = Util::getFormData('url', '');
+        $id  = Jojo::getFormData('id',  '');
+        $url = Jojo::getFormData('url', '');
         $baseurl = _SITEURL.'/'. self::getPrefix().'/';
 
         if (!empty($url)) {
