@@ -46,9 +46,9 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
         if (!empty($id) || !empty($url)) {
             $faq = false;
             if (!empty($id)) {
-                $faq = Jojo::selectRow("SELECT * FROM {faq} WHERE `faqid`=? AND `fq_pageid` = ? LIMIT 1", array($id, $this->id));
+                $faq = Jojo::selectRow("SELECT * FROM {faq} WHERE `faqid`=? AND `pageid` = ? LIMIT 1", array($id, $this->id));
             } elseif (!empty($url)) {
-                $faq = Jojo::selectRow("SELECT * FROM {faq} WHERE `fq_faqurl`=? AND `fq_pageid` = ? LIMIT 1", array($url, $this->id));
+                $faq = Jojo::selectRow("SELECT * FROM {faq} WHERE `fq_faqurl`=? AND `pageid` = ? LIMIT 1", array($url, $this->id));
             }
 
             if (!$faq) {
@@ -70,7 +70,7 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
             $content['breadcrumbs'] = $breadcrumbs;
         }
 
-        $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE `fq_pageid` = ?  ORDER BY fq_order, fq_question", array($this->id));
+        $faqs = Jojo::selectQuery("SELECT * FROM {faq} WHERE `pageid` = ?  ORDER BY fq_order, fq_question", array($this->id));
         $smarty->assign('faqs', $faqs);
         if ($faq_detail && (!empty($id) || !empty($url))) {
                 $content['content'] = $smarty->fetch('jojo_faq_detail.tpl');
@@ -114,7 +114,7 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
 
             /* Add FAQ pages to sitemap */
             foreach($faqs as $faq) {
-                $url           = _SITEURL . '/' . $prefix[$faq['fq_pageid']] . '/'. Jojo::either($faq['fq_faqurl'], $faq['faqid']).'/';
+                $url           = _SITEURL . '/' . $prefix[$faq['pageid']] . '/'. Jojo::either($faq['fq_faqurl'], $faq['faqid']).'/';
                 $lastmod       = $faq['fq_updated'];
                 $changefreq    = '';
                 $priority      = 0.4;

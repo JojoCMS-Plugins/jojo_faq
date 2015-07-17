@@ -21,15 +21,14 @@
 /* convert any old faq pages to the new plugin */
 $data = Jojo::selectQuery("SELECT * FROM {page} WHERE pg_link='faq.php'");
 foreach ($data as $page) {
-    Jojo::selectQuery("UPDATE {page} SET pg_link='Jojo_Plugin_Jojo_faq' WHERE pageid=? LIMIT 1", $page['pageid']);
+    Jojo::selectQuery("UPDATE {page} SET pg_link='jojo_plugin_jojo_faq' WHERE pageid=? LIMIT 1", $page['pageid']);
 }
 
 /* add FAQ page if it does not exist */
-Jojo::updateQuery("UPDATE {page} SET pg_link='Jojo_Plugin_Jojo_faq' WHERE pg_link='jojo_faq.php'");
-$data = Jojo::selectQuery("SELECT * FROM {page} WHERE pg_link='Jojo_Plugin_Jojo_faq'");
+$data = Jojo::selectQuery("SELECT * FROM {page} WHERE pg_link='jojo_plugin_jojo_faq'");
 if (!count($data)) {
     echo "Adding <b>FAQ</b> Page to menu<br />";
-    Jojo::insertQuery("INSERT INTO {page} SET pg_title='FAQ', pg_link='Jojo_Plugin_Jojo_faq', pg_url='faq'");
+    Jojo::insertQuery("INSERT INTO {page} SET pg_title='FAQ', pg_link='jojo_plugin_jojo_faq', pg_url='faq'");
 } else {
     if (empty($data[0]['pg_url'])) {//Set pg_url to "faq" if empty
         echo "Set discovery level URL for <b>FAQ</b><br />";
@@ -37,10 +36,9 @@ if (!count($data)) {
     }
 }
 
-/* convert any old edit faq pages to the new plugin */
-$data = Jojo::selectQuery("SELECT * FROM {page} WHERE pg_url='edit/faq'");
-foreach ($data as $page) {
-  Jojo::selectQuery("UPDATE {page} SET pg_url='admin/edit/faq' WHERE pageid=? LIMIT 1", $page['pageid']);
+/* convert any old edit faq tables to the new structure */
+if (Jojo::tableExists('faq') && !Jojo::fieldExists('faq', 'fq_pageid')) {
+  Jojo::structureQuery("ALTER TABLE  {faq} CHANGE  `fq_pageid`  `pageid` int(11) NOT NULL DEFAULT  '0'");
 }
 
 /* edit FAQ page */
@@ -51,5 +49,5 @@ if (!count($data)) {
 }
 
 /* Assign any orphaned faqs to a page */
-$faqpageid = current(Jojo::selectRow("SELECT pageid FROM {page} WHERE pg_link='Jojo_Plugin_Jojo_faq' LIMIT 1"));
-Jojo::updateQuery('UPDATE {faq} SET fq_pageid = ? WHERE fq_pageid = 0', $faqpageid);
+$faqpageid = current(Jojo::selectRow("SELECT pageid FROM {page} WHERE pg_link='jojo_plugin_jojo_faq'"));
+Jojo::updateQuery('UPDATE {faq} SET pageid = ? WHERE pageid = 0', $faqpageid);

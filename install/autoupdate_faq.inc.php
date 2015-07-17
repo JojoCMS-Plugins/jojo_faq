@@ -33,7 +33,7 @@ $default_fd['faq']['faqid'] = array(
     );
 
 // Page to Show on Field
-$default_fd['faq']['fq_pageid'] = array(
+$default_fd['faq']['pageid'] = array(
         'fd_name' => "Page to Show on",
         'fd_type' => "dbpluginpagelist",
         'fd_options' => "jojo_plugin_jojo_faq",
