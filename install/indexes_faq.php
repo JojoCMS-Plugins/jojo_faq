@@ -22,4 +22,4 @@
   eg $indexes['my_table'] = array('my_field'); //don't do this
  */
 
-$indexes['faq'][] = 'fq_pageid';
+$indexes['faq'][] = 'pageid';

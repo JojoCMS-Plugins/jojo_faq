@@ -37,7 +37,7 @@ if (!count($data)) {
 }
 
 /* convert any old edit faq tables to the new structure */
-if (Jojo::tableExists('faq') && !Jojo::fieldExists('faq', 'fq_pageid')) {
+if (Jojo::tableExists('faq') && Jojo::fieldExists('faq', 'fq_pageid')) {
   Jojo::structureQuery("ALTER TABLE  {faq} CHANGE  `fq_pageid`  `pageid` int(11) NOT NULL DEFAULT  '0'");
 }
 
