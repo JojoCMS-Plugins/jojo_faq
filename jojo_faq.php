@@ -99,7 +99,6 @@ class JOJO_Plugin_Jojo_faq extends JOJO_Plugin
         return false;
     }
 
-
     /**
      * XML Sitemap filter
      *
